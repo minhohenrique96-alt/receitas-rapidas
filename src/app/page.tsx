@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Heart, Clock, ChefHat, Cookie, Coffee, IceCream, Wine, X, ArrowLeft, Circle } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, Heart, Clock, ChefHat, Cookie, Coffee, IceCream, Wine, X, ArrowLeft, Circle, Crown, Lock } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,6 +21,14 @@ interface Recipe {
   instructions: string[]
   isFavorite: boolean
   isFitness?: boolean
+  isPremium?: boolean
+}
+
+interface SubscriptionData {
+  isPremium: boolean
+  planType: 'monthly' | 'yearly' | null
+  subscriptionStartDate: string | null
+  subscriptionEndDate: string | null
 }
 
 const recipes: Recipe[] = [
@@ -78,7 +86,8 @@ const recipes: Recipe[] = [
       "Despeje a massa na forma preparada e espalhe uniformemente. Leve ao forno preaquecido por 20-25 minutos. O brownie está pronto quando a superfície estiver firme mas o centro ainda levemente mole ao inserir um palito (deve sair com algumas migalhas úmidas grudadas).",
       "Retire do forno e deixe esfriar completamente na forma sobre uma grade antes de cortar em quadrados. Para cortes perfeitos, leve à geladeira por 1 hora antes de cortar com uma faca afiada limpa."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 3,
@@ -166,7 +175,8 @@ const recipes: Recipe[] = [
       "Leve à geladeira por no mínimo 4 horas ou até firmar completamente. O ideal é deixar de um dia para o outro para garantir a textura perfeita.",
       "Na hora de servir, decore cada porção com polpa de maracujá fresca com sementes por cima e, se desejar, uma folhinha de hortelã. A acidez da polpa fresca contrasta perfeitamente com a doçura da mousse."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 25,
@@ -228,7 +238,8 @@ const recipes: Recipe[] = [
       "Sirva imediatamente com uma colher. O smoothie bowl é perfeito para café da manhã pós-treino ou lanche saudável."
     ],
     isFavorite: false,
-    isFitness: true
+    isFitness: true,
+    isPremium: true
   },
   {
     id: 27,
@@ -289,7 +300,8 @@ const recipes: Recipe[] = [
       "Sirva as panquecas empilhadas, regadas com mel, cobertas com frutas frescas e uma colherada de pasta de amendoim. Perfeito para café da manhã pós-treino!"
     ],
     isFavorite: false,
-    isFitness: true
+    isFitness: true,
+    isPremium: true
   },
   {
     id: 29,
@@ -371,7 +383,8 @@ const recipes: Recipe[] = [
       "Decore com uma fatia generosa de laranja e, se desejar, uma azeitona verde espetada em um palito.",
       "Sirva imediatamente. O Aperol Spritz perfeito deve ter cor laranja vibrante, ser levemente amargo, refrescante e bem gaseificado."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 32,
@@ -468,7 +481,8 @@ const recipes: Recipe[] = [
       "Monte o bolo: Coloque uma camada de massa em um prato, espalhe o brigadeiro, cubra com a segunda camada e despeje a ganache por cima, deixando escorrer pelas laterais.",
       "Leve à geladeira por 1 hora antes de servir para firmar a cobertura."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 35,
@@ -496,7 +510,7 @@ const recipes: Recipe[] = [
     ],
     instructions: [
       "Preaqueça o forno a 180°C. Unte e enfarinhe duas formas redondas de 20cm.",
-      "Em uma tigela, peneire a farinha, o açúcar, o bicarbonato, o cacau e o sal. Misture bem.",
+      "Em uma tigela, peneie a farinha, o açúcar, o bicarbonato, o cacau e o sal. Misture bem.",
       "Em outra tigela, bata os ovos levemente. Adicione o óleo, o leitelho, o corante vermelho e a essência de baunilha. Misture bem.",
       "Adicione os ingredientes líquidos aos secos e misture delicadamente até incorporar. Não mexa demais.",
       "Por último, adicione o vinagre e misture rapidamente por 10 segundos.",
@@ -506,7 +520,8 @@ const recipes: Recipe[] = [
       "Monte o bolo: Coloque uma camada de massa, espalhe frosting, cubra com a segunda camada e cubra todo o bolo com o restante do frosting.",
       "Decore com raspas de chocolate branco ou frutas vermelhas. Leve à geladeira por 30 minutos antes de servir."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 36,
@@ -561,7 +576,8 @@ const recipes: Recipe[] = [
       "Deixe esfriar completamente, depois leve à geladeira por no mínimo 6 horas ou de um dia para o outro.",
       "Para desenformar, passe uma faca nas bordas e vire em um prato com borda. Sirva bem gelado."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 38,
@@ -592,7 +608,8 @@ const recipes: Recipe[] = [
       "Cubra com filme plástico e leve à geladeira por no mínimo 4 horas ou, de preferência, de um dia para o outro.",
       "Na hora de servir, polvilhe generosamente com cacau em pó peneirado e, se desejar, decore com chocolate ralado. Corte em quadrados e sirva bem gelado."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 39,
@@ -659,7 +676,6 @@ const recipes: Recipe[] = [
     isFavorite: false,
     isFitness: true
   },
-  // NOVAS RECEITAS ADICIONADAS
   {
     id: 41,
     name: "Risoto de Camarão",
@@ -693,7 +709,8 @@ const recipes: Recipe[] = [
       "Adicione os camarões grelhados e misture delicadamente. Ajuste o sal e pimenta.",
       "Sirva imediatamente em pratos fundos, finalizando com salsinha fresca, um fio de azeite extra virgem e mais parmesão se desejar."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 42,
@@ -803,7 +820,8 @@ const recipes: Recipe[] = [
       "Cubra com papel alumínio e leve ao forno por 30 minutos. Retire o papel alumínio e asse por mais 15 minutos até gratinar e dourar.",
       "Retire do forno e deixe descansar por 10 minutos antes de cortar. Sirva quente."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 45,
@@ -890,7 +908,8 @@ const recipes: Recipe[] = [
       "Antes de secar, passe no cacau em pó, chocolate granulado ou coco ralado. Coloque em forminhas.",
       "Guarde na geladeira em recipiente fechado por até 2 semanas. Retire 10 minutos antes de servir para melhor sabor."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 48,
@@ -943,7 +962,8 @@ const recipes: Recipe[] = [
       "Sirva imediatamente. Não mexa mais - deixe os aromas se desenvolverem naturalmente.",
       "Dica: A proporção ideal é 1 parte de gin para 2,5 partes de tônica. Use sempre água tônica de qualidade e bem gelada."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 50,
@@ -1115,7 +1135,8 @@ const recipes: Recipe[] = [
       "Prepare a calda: Em uma panela, cozinhe as frutas vermelhas com o açúcar e o suco de limão por 10 minutos até formar uma calda. Deixe esfriar.",
       "Desenforme o cheesecake e cubra com a calda de frutas vermelhas. Sirva bem gelado."
     ],
-    isFavorite: false
+    isFavorite: false,
+    isPremium: true
   },
   {
     id: 55,
@@ -1186,7 +1207,8 @@ const recipes: Recipe[] = [
       "Guarde na geladeira em recipiente fechado por até 3 dias."
     ],
     isFavorite: false,
-    isFitness: true
+    isFitness: true,
+    isPremium: true
   },
   {
     id: 57,
@@ -1266,6 +1288,41 @@ export default function RecipesApp() {
   const [searchTerm, setSearchTerm] = useState("")
   const [recipesList, setRecipesList] = useState(recipes)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [showPremiumModal, setShowPremiumModal] = useState(false)
+  const [subscription, setSubscription] = useState<SubscriptionData>({
+    isPremium: false,
+    planType: null,
+    subscriptionStartDate: null,
+    subscriptionEndDate: null
+  })
+
+  // Carregar dados de assinatura do localStorage
+  useEffect(() => {
+    const savedSubscription = localStorage.getItem('recipeAppSubscription')
+    if (savedSubscription) {
+      const data: SubscriptionData = JSON.parse(savedSubscription)
+      
+      // Validar se a assinatura ainda está ativa
+      if (data.subscriptionEndDate) {
+        const endDate = new Date(data.subscriptionEndDate)
+        const now = new Date()
+        
+        if (now > endDate) {
+          // Assinatura expirada - desativar premium
+          const expiredData: SubscriptionData = {
+            isPremium: false,
+            planType: null,
+            subscriptionStartDate: null,
+            subscriptionEndDate: null
+          }
+          setSubscription(expiredData)
+          localStorage.setItem('recipeAppSubscription', JSON.stringify(expiredData))
+        } else {
+          setSubscription(data)
+        }
+      }
+    }
+  }, [])
 
   const categories: { name: Category; icon: any }[] = [
     { name: "Todas", icon: ChefHat },
@@ -1290,6 +1347,41 @@ export default function RecipesApp() {
     ))
   }
 
+  const handleRecipeClick = (recipe: Recipe) => {
+    // Verificar se a receita é premium e o usuário não tem assinatura
+    if (recipe.isPremium && !subscription.isPremium) {
+      setShowPremiumModal(true)
+    } else {
+      setSelectedRecipe(recipe)
+    }
+  }
+
+  const handleSubscribe = (planType: 'monthly' | 'yearly') => {
+    const now = new Date()
+    const endDate = new Date()
+    
+    // Calcular data de expiração
+    if (planType === 'monthly') {
+      endDate.setDate(endDate.getDate() + 30)
+    } else {
+      endDate.setDate(endDate.getDate() + 365)
+    }
+
+    const newSubscription: SubscriptionData = {
+      isPremium: true,
+      planType: planType,
+      subscriptionStartDate: now.toISOString(),
+      subscriptionEndDate: endDate.toISOString()
+    }
+
+    setSubscription(newSubscription)
+    localStorage.setItem('recipeAppSubscription', JSON.stringify(newSubscription))
+    setShowPremiumModal(false)
+    
+    // Mostrar mensagem de sucesso
+    alert(`✅ Assinatura ${planType === 'monthly' ? 'Mensal' : 'Anual'} ativada com sucesso!\n\nVocê agora tem acesso a todas as receitas premium! 🎉`)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
@@ -1307,6 +1399,14 @@ export default function RecipesApp() {
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Delícias em minutos</p>
               </div>
             </div>
+            
+            {/* Premium Badge */}
+            {subscription.isPremium && (
+              <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 px-4 py-2 rounded-full shadow-lg">
+                <Crown className="w-5 h-5 text-white" />
+                <span className="text-white font-bold text-sm">Premium {subscription.planType === 'monthly' ? 'Mensal' : 'Anual'}</span>
+              </div>
+            )}
             
             {/* Search Bar */}
             <div className="relative w-full sm:w-96">
@@ -1388,6 +1488,12 @@ export default function RecipesApp() {
                       Fitness
                     </Badge>
                   )}
+                  {recipe.isPremium && (
+                    <Badge className="absolute top-3 right-14 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 flex items-center gap-1">
+                      <Crown className="w-3 h-3" />
+                      Premium
+                    </Badge>
+                  )}
                 </div>
 
                 <CardHeader className="pb-3">
@@ -1422,10 +1528,21 @@ export default function RecipesApp() {
 
                 <CardFooter>
                   <Button 
-                    onClick={() => setSelectedRecipe(recipe)}
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl shadow-md transition-all duration-300"
+                    onClick={() => handleRecipeClick(recipe)}
+                    className={`w-full rounded-xl shadow-md transition-all duration-300 ${
+                      recipe.isPremium && !subscription.isPremium
+                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                        : "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                    } text-white`}
                   >
-                    Ver Receita Completa
+                    {recipe.isPremium && !subscription.isPremium ? (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Ver Receita Premium
+                      </>
+                    ) : (
+                      "Ver Receita Completa"
+                    )}
                   </Button>
                 </CardFooter>
               </Card>
@@ -1433,6 +1550,100 @@ export default function RecipesApp() {
           </div>
         )}
       </div>
+
+      {/* Premium Modal */}
+      <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent flex items-center justify-center gap-2">
+              <Crown className="w-8 h-8 text-yellow-500" />
+              Conteúdo Exclusivo Premium
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <p className="text-center text-gray-600 dark:text-gray-400 text-lg">
+              Esta receita é exclusiva para assinantes Premium. Escolha um plano e tenha acesso ilimitado a todas as receitas premium!
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Plano Mensal */}
+              <div className="border-2 border-orange-300 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-orange-600">Plano Mensal</h3>
+                  <div className="space-y-2">
+                    <p className="text-4xl font-bold text-gray-800 dark:text-gray-200">R$ 19,90</p>
+                    <p className="text-sm text-gray-500">por mês</p>
+                  </div>
+                  <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Acesso a todas as receitas premium
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Novas receitas toda semana
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Suporte prioritário
+                    </li>
+                  </ul>
+                  <Button 
+                    onClick={() => handleSubscribe('monthly')}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl py-6 text-lg font-bold"
+                  >
+                    Assinar Plano Mensal
+                  </Button>
+                </div>
+              </div>
+
+              {/* Plano Anual */}
+              <div className="border-2 border-yellow-400 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  ECONOMIZE 37%
+                </div>
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-yellow-600">Plano Anual</h3>
+                  <div className="space-y-2">
+                    <p className="text-4xl font-bold text-gray-800 dark:text-gray-200">R$ 149,90</p>
+                    <p className="text-sm text-gray-500">por ano</p>
+                    <p className="text-xs text-green-600 font-semibold">Apenas R$ 12,49/mês</p>
+                  </div>
+                  <ul className="space-y-2 text-left text-sm text-gray-600 dark:text-gray-400">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Acesso a todas as receitas premium
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Novas receitas toda semana
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Suporte prioritário
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      Conteúdo exclusivo de chefs
+                    </li>
+                  </ul>
+                  <Button 
+                    onClick={() => handleSubscribe('yearly')}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-xl py-6 text-lg font-bold"
+                  >
+                    Assinar Plano Anual
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-center text-xs text-gray-500">
+              * Valores simulados para demonstração. Cancele quando quiser.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Recipe Detail Dialog */}
       <Dialog open={!!selectedRecipe} onOpenChange={() => setSelectedRecipe(null)}>
@@ -1469,6 +1680,12 @@ export default function RecipesApp() {
                   {selectedRecipe.isFitness && (
                     <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
                       Fitness
+                    </Badge>
+                  )}
+                  {selectedRecipe.isPremium && (
+                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white flex items-center gap-1">
+                      <Crown className="w-3 h-3" />
+                      Premium
                     </Badge>
                   )}
                   <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
